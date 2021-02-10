@@ -49,9 +49,10 @@ const Toolbar = ({
     if (form.moduleName !== '') {
       if (currentId === 0 || currentId === undefined) create(form, onSuccess);
       else update(currentId, form, onSuccess);
-    }
 
-    setSelectedItem([]);
+      onInputChange('');
+      setSelectedItem([]);
+    }
   };
 
   return (

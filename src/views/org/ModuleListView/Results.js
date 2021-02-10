@@ -36,10 +36,11 @@ const Results = ({
   currentId,
   onEdit,
   onDelete,
+  selectedItems,
+  selectAllItems,
   ...rest
 }) => {
   const classes = useStyles();
-  const [selectedModuleIds, setSelectedModuleIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
 
@@ -47,38 +48,15 @@ const Results = ({
     let newSelectedModuleIds;
 
     if (event.target.checked) {
-      newSelectedModuleIds = modules.map((module) => module.id);
+      newSelectedModuleIds = modules.map((module) => module.ids);
     } else {
       newSelectedModuleIds = [];
     }
-
-    setSelectedModuleIds(newSelectedModuleIds);
+    selectAllItems(newSelectedModuleIds);
   };
 
-  const handleSelectOne = (event, id) => {
+  const handleSelectOne = (id) => {
     selectItem(id);
-
-    const selectedIndex = selectedModuleIds.indexOf(id);
-    let newSelectedModuleIds = [];
-
-    if (selectedIndex === -1) {
-      newSelectedModuleIds = newSelectedModuleIds.concat(selectedModuleIds, id);
-    } else if (selectedIndex === 0) {
-      newSelectedModuleIds = newSelectedModuleIds.concat(
-        selectedModuleIds.slice(1)
-      );
-    } else if (selectedIndex === selectedModuleIds.length - 1) {
-      newSelectedModuleIds = newSelectedModuleIds.concat(
-        selectedModuleIds.slice(0, -1)
-      );
-    } else if (selectedIndex > 0) {
-      newSelectedModuleIds = newSelectedModuleIds.concat(
-        selectedModuleIds.slice(0, selectedIndex),
-        selectedModuleIds.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelectedModuleIds(newSelectedModuleIds);
   };
 
   const handleLimitChange = (event) => {
@@ -88,7 +66,6 @@ const Results = ({
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
-
   return (
     <Card className={clsx(classes.root, className)} {...rest}>
       <Box maxWidth={500}>
@@ -113,7 +90,12 @@ const Results = ({
         >
           <Button>Import</Button>
           <Button>Export</Button>
-          <Button onClick={onEdit}>Edit</Button>
+          <Button
+            onClick={onEdit}
+            disabled={selectedItems.length > 1 ? true : ''}
+          >
+            Edit
+          </Button>
           <Button onClick={onDelete}>Delete</Button>
         </ButtonGroup>
       </Box>
@@ -124,10 +106,11 @@ const Results = ({
               <TableRow>
                 <TableCell padding="checkbox">
                   <Checkbox
-                    checked={selectedModuleIds.length === modules.length}
+                    checked={selectedItems.length === modules.length}
                     color="primary"
                     indeterminate={
-                      selectedModuleIds.length > 0 && selectedModuleIds.length < modules.length
+                      selectedItems.length > 0
+                      && selectedItems.length < modules.length
                     }
                     onChange={handleSelectAll}
                   />
@@ -141,12 +124,14 @@ const Results = ({
                 <TableRow
                   hover
                   key={module.ids}
-                  selected={selectedModuleIds.indexOf(module.ids) !== -1}
+                  selected={selectedItems.indexOf(module.ids) !== -1}
                 >
                   <TableCell padding="checkbox">
                     <Checkbox
-                      checked={selectedModuleIds.indexOf(module.ids) !== -1}
-                      onChange={(event) => handleSelectOne(event, module.ids)}
+                      checked={
+                        selectedItems.indexOf(module.ids) !== -1 ? true : ''
+                      }
+                      onChange={() => handleSelectOne(module.ids)}
                       value="true"
                     />
                   </TableCell>
@@ -180,7 +165,9 @@ Results.propTypes = {
   selectItem: PropTypes.func,
   currentId: PropTypes.array,
   onEdit: PropTypes.func,
-  onDelete: PropTypes.func
+  onDelete: PropTypes.func,
+  selectedItems: PropTypes.array,
+  selectAllItems: PropTypes.func
 };
 
 export default Results;

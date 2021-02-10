@@ -29,8 +29,16 @@ const ModuleListView = ({
 
   const selectItem = (id) => {
     const newIds = selectedItems.slice();
-    newIds.push(id);
+    if (newIds.indexOf(id) !== -1) {
+      newIds.splice(newIds.indexOf(id), 1);
+    } else {
+      newIds.push(id);
+    }
     setSelectedItem(newIds);
+  };
+
+  const selectAllItems = (items) => {
+    setSelectedItem(items);
   };
 
   const { addToast } = useToasts();
@@ -61,9 +69,11 @@ const ModuleListView = ({
         <Box mt={3}>
           <Results
             selectItem={selectItem}
+            selectedItems={selectedItems}
             modules={modules}
             onEdit={onEdit}
             onDelete={onDelete}
+            selectAllItems={selectAllItems}
           />
         </Box>
       </Container>
